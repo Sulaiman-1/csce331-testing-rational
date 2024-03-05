@@ -4,7 +4,7 @@ package numbers;
  * Hello world!
  *
  */
-public class App 
+public class Rational 
 {
     public static void main( String[] args )
     {
