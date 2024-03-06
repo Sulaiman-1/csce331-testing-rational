@@ -52,13 +52,18 @@ public class Rational extends Number implements Comparable<Number>
     //from integer
     public Rational(int a)
     {
-        theNumerator = a;
-        theDenominator = 1;
+        this(a, 1);
     }
     
     //from numerator and denominator
     public Rational(int a, int b)
     {
+        if(b < 0)
+        {
+            a*= -1;
+            b*= -1;
+        }
+
         //account for integer overflow
         if(b == 0)
         {
