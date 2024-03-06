@@ -34,10 +34,9 @@ public class RationalTest
     /**
      * Rigourous Test :-)
      */
-    public void testRational()
+    public void testRationalNoArg()
     {
         // Given no preconditions
-
         // When I create a default `Rational` value
         Rational value = new Rational();
         // Then the value should have numerator 0
@@ -46,7 +45,7 @@ public class RationalTest
         assertThat("the denominator should be 1", value.denominator(), is(1));
     }
 
-    public void testRationalInt()
+    public void testRationalOneArg()
     {
         // Given that I have constructed a `Rational` value using the argument `2`
         Rational value = new Rational(2);
@@ -54,5 +53,15 @@ public class RationalTest
         assertThat("the numerator should be 2", value.numerator(), is(2));
         // And the value should have denominator `1`
         assertThat("the denominator should be 1", value.denominator(), is(1));
+    }
+
+    public void testRationalTwoArgs()
+    {
+        // Given that I have created a Rational value using arguments `2`` and `3`
+        Rational value = new Rational(2, 3);
+        // Then the value should have numerator `2`
+        assertThat("the numerator should be 2", value.numerator(), is(2));
+        // And the value should have denominator `3`
+        assertThat("the denominator should be 3", value.denominator(), is(3));
     }
 }
