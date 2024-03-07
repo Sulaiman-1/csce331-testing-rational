@@ -134,16 +134,27 @@ public class Rational extends Number implements Comparable<Number>
     public boolean greaterThan(Object o)
     {
         Rational r = (Rational)o;
-        return true;
+        
+        if(theNumerator * r.denominator() > r.numerator() * theDenominator)
+        {
+            return true;
+        }
+        return false;
     }
     //  - less than
     public boolean lessThan(Object o)
     {
         Rational r = (Rational)o;
-        return true;
+        
+        if(theNumerator * r.denominator() < r.numerator() * theDenominator)
+        {
+            return true;
+        }
+        return false;
     }
 //#endregion
 
+//#region is 0, 1, -1
     //is zero
     public boolean isZero()
     {
@@ -159,8 +170,9 @@ public class Rational extends Number implements Comparable<Number>
     {
         return theNumerator == -1*theDenominator;
     }
+//#endregion
     
-    //pretty print
+//pretty print
     public String toString()
     {
         if(theDenominator != 1)
@@ -174,37 +186,38 @@ public class Rational extends Number implements Comparable<Number>
         
     }
 
+//#region override functions
     @Override
     public int compareTo(Number arg0) 
     {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'compareTo'");
+        double thisValue = doubleValue();
+        double thatValue = arg0.doubleValue();
+
+        return Double.compare(thisValue, thatValue);
     }
 
     @Override
     public double doubleValue() 
     {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'doubleValue'");
+        return (double) theNumerator / theDenominator;
     }
 
     @Override
     public float floatValue() 
     {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'floatValue'");
+        return (float) theNumerator / theDenominator;
     }
 
     @Override
     public int intValue() 
     {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'intValue'");
+        return theNumerator / theDenominator;
     }
 
     @Override
-    public long longValue() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'longValue'");
+    public long longValue() 
+    {
+        return (long) theNumerator / theDenominator;
     }
+//#endregion
 }
