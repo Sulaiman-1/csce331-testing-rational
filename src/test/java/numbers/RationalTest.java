@@ -216,6 +216,16 @@ public class RationalTest
         assertThat("3 = 3", result.denominator(), is(3));
     }
 
+    public void test_Plus_Overflow() 
+    {
+        // Given two rationals that will overflow when added
+        Rational large1 = new Rational(Integer.MAX_VALUE, 1);
+        Rational small1 = new Rational(1, 1);
+        
+        // Expect an ArithmeticException when adding large values
+        assertThrows(ArithmeticException.class, () -> large1.plus(small1));
+    }
+
     public void test_Minus()
     {
         // Given that I have created Rationals representing 3/4 and 1/2
@@ -240,6 +250,16 @@ public class RationalTest
         assertThat("3 * 7 = 21", result.denominator(), is(21));
     }
 
+    public void test_Times_Overflow() 
+    {
+        // Given two rationals that will overflow when added
+        Rational large1 = new Rational(Integer.MAX_VALUE, 1);
+        Rational small1 = new Rational(2, 1);
+        
+        // Expect an ArithmeticException when adding large values
+        assertThrows(ArithmeticException.class, () -> large1.times(small1));
+    }
+
     public void test_DivideBy()
     {
         // Given that I have created Rationals representing 2/3 and 5/7
@@ -261,6 +281,22 @@ public class RationalTest
         // Then the result should be 4/9 because (2/3)^2 = 4/9
         assertThat("2^2 = 4", result.numerator(), is(4));
         assertThat("3^2 = 9", result.denominator(), is(9));
+    }
+
+    public void test1_Raised_To_The_Power_Of_Overflow()
+    {
+        // Given that I have created a Rational representing 2/3
+        Rational x = new Rational(Integer.MAX_VALUE, 1);
+        // When I raise x to the power of 2
+        assertThrows(ArithmeticException.class, () -> x.raisedToThePowerOf(2));
+    }
+
+    public void test2_Raised_To_The_Power_Of_Overflow()
+    {
+        // Given that I have created a Rational representing 2/3
+        Rational x = new Rational(1, Integer.MAX_VALUE);
+        // When I raise x to the power of 2
+        assertThrows(ArithmeticException.class, () -> x.raisedToThePowerOf(2));
     }
     //#endregion
 

@@ -45,8 +45,7 @@ public class Rational extends Number implements Comparable<Number>
     //default : 0
     public Rational()
     {
-        theNumerator = 0;
-        theDenominator = 1;
+        this(0);
     }
 
     //from integer
@@ -88,10 +87,18 @@ public class Rational extends Number implements Comparable<Number>
     //addition
     public Rational plus(Rational r)
     {
-        int newNumerator = r.denominator() * theNumerator + theDenominator * r.numerator();
-        int newDenominator = theDenominator * r.denominator();
+        try 
+        {
+            int newNumerator = Math.addExact(Math.multiplyExact(r.denominator(), theNumerator), Math.multiplyExact(theDenominator, r.numerator()));
+            int newDenominator = Math.multiplyExact(theDenominator, r.denominator());
         
-        return new Rational(newNumerator, newDenominator);
+            return new Rational(newNumerator, newDenominator);
+        } 
+        catch (ArithmeticException e) 
+        {
+            throw new ArithmeticException("Overflow occured");
+        }
+        
     }
     //subtraction
     public Rational minus(Rational r)
@@ -104,7 +111,16 @@ public class Rational extends Number implements Comparable<Number>
     //multiply
     public Rational times(Rational r)
     {
-        return new Rational(theNumerator * r.numerator(), theDenominator * r.denominator());
+        try
+        {
+            int newNumerator = Math.multiplyExact(theNumerator, r.numerator());
+            int newDenominator = Math.multiplyExact(theDenominator, r.denominator());
+            return new Rational(newNumerator, newDenominator);
+        }
+        catch(ArithmeticException e)
+        {
+            throw new ArithmeticException("Overflow occured");
+        }
     }
     //divide
     public Rational dividedBy(Rational r)
@@ -115,7 +131,21 @@ public class Rational extends Number implements Comparable<Number>
     //raise to a power
     public Rational raisedToThePowerOf(int n)
     {
-        return new Rational((int)Math.pow(theNumerator, n), (int)Math.pow(theDenominator, n));
+
+        long newNumerator = (long)Math.pow(theNumerator, n);
+        long newDenominator = (long)Math.pow(theDenominator, n);
+
+        
+
+        if(newNumerator > Integer.MAX_VALUE || newDenominator > Integer.MAX_VALUE)
+        {
+            throw new ArithmeticException("Overflow has occured");
+        }
+        else
+        {
+            return new Rational((int)newNumerator, (int)newDenominator);
+        }
+        
     }
 //#endregion
 
