@@ -11,8 +11,7 @@ import junit.framework.TestSuite;
 /**
  * Unit test for simple App.
  */
-public class RationalTest 
-    extends TestCase
+public class RationalTest extends TestCase
 {
     /**
      * Create the test case
@@ -34,9 +33,70 @@ public class RationalTest
 
     /**
      * Rigourous Test :-)
-     */
+    */
 
-     //#region constructor tests
+    public void test_NumberToRational_Rational() 
+    {
+        Rational input = new Rational(3, 4);
+        Rational result = input.numberToRational(input);
+        assertThat(result, is(input));
+    }
+
+    public void test_opposite()
+    {
+        Rational r = new Rational(3, 5);
+
+        assertThat("the opposite of 3/5 is -3/5", r.opposite(), is(new Rational(-3, 5)));
+    }
+
+    public void test_reciprocal()
+    {
+        Rational r = new Rational(3, 5);
+
+        assertThat("the reciprocal of 3/5 is 5/3", r.reciprocal(), is(new Rational(5, 3)));
+    }
+
+
+//#region value checks tests
+    //#region isZero
+    public void test_isZero()
+    {
+        assertThat("0 is 0", new Rational().isZero(), is(true));
+    }
+
+    public void test_isZero_Sad()
+    {
+        assertThat("1 is not 0", new Rational(1).isZero(), is(false));
+    }
+    //#endregion
+
+    //#region isOne
+    public void test_isOne()
+    {
+        assertThat("1 is 1", new Rational(1).isOne(), is(true));
+    }
+
+    public void test_isOne_Sad()
+    {
+        assertThat("0 is not 1", new Rational().isOne(), is(false));
+    }
+    //#endregion
+
+    //#region isMinusOne
+    public void test_isMinusOne()
+    {
+        assertThat("-1 is -1", new Rational(-1).isMinusOne(), is(true));
+    }
+
+    public void test_isMinusOne_Sad()
+    {
+        assertThat("0 is not -1", new Rational().isMinusOne(), is(false));
+    }
+    //#endregion
+//#endregion
+
+
+//#region constructor tests
     public void test_Default_Constructor()
     {
         // Given no preconditions
@@ -48,362 +108,442 @@ public class RationalTest
         assertThat("the denominator should be 1", value.denominator(), is(1));
     }
 
-    public void test_One_Arg_Constructor()
+    public void test_Rational_Constructor()
     {
-        // Given that I have constructed a `Rational` value using the argument `2`
-        Rational value = new Rational(2);
-        // Then the value should have numerator `2`
-        assertThat("the numerator should be 2", value.numerator(), is(2));
-        // And the value should have denominator `1`
-        assertThat("the denominator should be 1", value.denominator(), is(1));
+        Rational r = new Rational(1, 2);
+
+        Rational r2 = new Rational(r);
+
+        assertThat("r = r2", r.equals(r2), is(true));
     }
 
-    public void test_Two_Args_Constructor()
-    {
-        // Given that I have created a Rational value using arguments `2`` and `3`
-        Rational value = new Rational(2, 3);
-        // Then the value should have numerator `2`
-        assertThat("the numerator should be 2", value.numerator(), is(2));
-        // And the value should have denominator `3`
-        assertThat("the denominator should be 3", value.denominator(), is(3));
-    }
-
-    public void test_Rational_Arg_Constructor()
-    {
-        // Given that I have created the `Rational` value `2/3`
-        Rational original = new Rational(2, 3);
-        // When I create a `Rational` value as a copy of the original `Rational` value
-        Rational value = new Rational(original);
-        // Then the copy's value should have numerator 2
-        assertThat("the numerator should be 2", value.numerator(), is(2));
-        // And the copy's value should have denominator 3
-        assertThat("the denominator should be 3", value.denominator(), is(3));
-    }
-    //#endregion
-
-    //#region test recip, opp, and neg denominator
-    public void test_Negative_Denominator()
-    {
-        // Given I have created a `Rational` value using `48` and `-72`
-        Rational value = new Rational(48, -72);
-        // Then the value should have numerator `-2`
-        assertThat("48 / -72 = -2 / 3", value.numerator(), is(-2));
-        // And the value should have denominator `3`
-        assertThat("48 / -72 = -2 / 3", value.denominator(), is(3));
-    }
-
-    public void test_Denominator_0()
+    //sad paths
+    public void test_Invalid_Denominator()
     {
         assertThrows(IllegalArgumentException.class, () -> new Rational(1, 0));
     }
 
-    public void test_Opposite()
+    public void test_Negative_Denominator()
     {
-        //Given that I have created the Rational value 2/3
-        Rational value = new Rational(2, 3);
-        //When I compute the opposite of the value
-        Rational opposite = value.opposite();
-        //Then the opposite shuld have numerator -2
-        assertThat("the opposite of 2 is -2", opposite.numerator(), is(-2));
-        //And the opposite should have denominator 3
-        assertThat("the denominator should be 3", opposite.denominator(), is(3));
-    }
+        Rational r = new Rational(3, -5);
 
-    public void test_Happy_Reciprocal()
-    {
-        //Given that I have created the Rational value 2/3
-        Rational value = new Rational(2, 3);
-        //When I compute the reciprocal of the value
-        Rational reciprocal = value.reciprocal();
-        //Then the reciprocal should have numerator 3
-        assertThat("the numerator should be 3", reciprocal.numerator(), is(3));
-        //And the reciprocal should have denominator 2
-        assertThat("the denominator should be 2", reciprocal.denominator(), is(2));
-    }
-
-    public void test_Sad_Reciprocal()
-    {
-        //Given that I have created the Rational value 0
-        Rational value = new Rational(0);
-        //When I compute the reciprocal of the value
-        //Then an exception should be thrown
-        assertThrows(IllegalArgumentException.class, value::reciprocal);
-    }
-    //#endregion
-
-    //#region comparisons
-    public void test_happy_Equal()
-    {
-        Rational r = new Rational(3, 2);
-        Rational r2 = new Rational(6, 4);
-
-        boolean areEqual = r.equals(r2);
-
-        assertThat("r = r2", areEqual, is(true));
-    }
-
-    public void test_sad_Equal()
-    {
-        Rational r = new Rational(3, 2);
-        Rational r2 = new Rational(2, 3);
-
-        boolean areEqual = r.equals(r2);
-
-        assertThat("r =/= r2", areEqual, is(false));
-    }
-
-    public void test_sad2_Equal()
-    {
-        Rational r = new Rational(3, 2);
-        Rational r2 = new Rational(3, 4);
-
-        boolean areEqual = r.equals(r2);
-
-        assertThat("r =/= r2", areEqual, is(false));
+        assertThat("3/-5  is -3/5", r.equals(new Rational(-3, 5)), is(true));
     }
     
-    public void test_happy_greaterThan()
+//#endregion
+
+
+//#region operations
+    //#region addition
+    public void test_plus()
     {
-        Rational r = new Rational(3, 2);
-        Rational r2 = new Rational(3, 4);
-
-        boolean isGreater = r.greaterThan(r2);
-
-        assertThat("r > r2", isGreater, is(true));
-    }
-
-    public void test_sad_greaterThan()
-    {
-        Rational r = new Rational(3, 20);
-        Rational r2 = new Rational(3, 4);
-
-        boolean isGreater = r.greaterThan(r2);
-
-        assertThat("r is not greater than r2", isGreater, is(false));
-    }
-
-    public void test_happy_lessThan()
-    {
-        Rational r = new Rational(3, 20);
-        Rational r2 = new Rational(3, 4);
-
-        boolean isLess = r.lessThan(r2);
-
-        assertThat("r < r2", isLess, is(true));
-    }
-
-    public void test_sad_lessThan()
-    {
-        Rational r = new Rational(3, 2);
-        Rational r2 = new Rational(3, 4);
-
-        boolean isLess = r.lessThan(r2);
-
-        assertThat("r is not less than r2", isLess, is(false));
-    }
-    //#endregion
-
-    //#region test operations
-    public void test_Plus()
-    {
-        // Given that I have created Rationals representing 1/3 and 2/3
-        Rational t = new Rational(1, 3);
-        Rational u = new Rational(2, 3);
-        // When I compute the value of 1/3 plus 2/3
-        Rational result = t.plus(u);
-        // Then the result should be 3/3 or 1
-        assertThat("1 + 2 = 3", result.numerator(), is(3));
-        assertThat("3 = 3", result.denominator(), is(3));
-    }
-
-    public void test_Plus_Overflow() 
-    {
-        // Given two rationals that will overflow when added
-        Rational large1 = new Rational(Integer.MAX_VALUE, 1);
-        Rational small1 = new Rational(1, 1);
+        Rational r = new Rational(3, 5);
         
-        // Expect an ArithmeticException when adding large values
-        assertThrows(ArithmeticException.class, () -> large1.plus(small1));
+        Rational r2 = r.plus(r);
+
+        assertThat("3 + 3 = 6", r2.numerator(), is(6));
+        assertThat("denominator is 5", r2.denominator(), is(5));
     }
 
-    public void test_Minus()
+    public void test_plus_Sad()
     {
-        // Given that I have created Rationals representing 3/4 and 1/2
-        Rational r = new Rational(3, 4);
-        Rational s = new Rational(1, 2);
-        // When I compute the value of 3/4 minus 1/2
-        Rational result = r.minus(s);
-        // Then the result should be 1/4
-        assertThat("3 - (2)1 = 1", result.numerator(), is(1));
-        assertThat("4 = 4", result.denominator(), is(4));
+        Rational r1 = new Rational(Integer.MAX_VALUE);
+        Rational r2 = new Rational(1);
+
+        assertThrows(IllegalArgumentException.class, () -> r1.plus(r2));
+    }
+    //#endregion
+
+    //#region subtraction
+    public void test_minus()
+    {
+        Rational r = new Rational(3, 5);
+        Rational r2 = r.minus(r);
+
+        assertThat("3 - 3 = 0", r2.numerator(), is(0));
+        assertThat("denominator is 1 after simplification", r2.denominator(), is(1));
+    }
+    
+    public void test_minus_Sad()
+    {
+        Rational r1 = new Rational(Integer.MIN_VALUE);
+        Rational r2 = new Rational(1);
+
+        assertThrows(IllegalArgumentException.class, () -> r1.minus(r2));
+    }
+    //#endregion
+    
+    //#region multiplication
+    public void test_times()
+    {
+        Rational r = new Rational(3, 5);
+        r = r.times(r);
+
+        assertThat("3 * 3 = 9", r.numerator(), is(9));
+        assertThat("5 * 5 = 25", r.denominator(), is(25));
     }
 
-    public void test_Times()
+    public void test_times_Sad()
     {
-        // Given that I have created Rationals representing 2/3 and 5/7
-        Rational p = new Rational(2, 3);
-        Rational q = new Rational(5, 7);
-        // When I compute the value of 2/3 times 5/7
-        Rational result = p.times(q);
-        // Then the result should be 10/21
-        assertThat("2 * 5 = 10", result.numerator(), is(10));
-        assertThat("3 * 7 = 21", result.denominator(), is(21));
+        Rational r1 = new Rational(Integer.MAX_VALUE);
+        Rational r2 = new Rational(2);
+
+        assertThrows(IllegalArgumentException.class, () -> r1.times(r2));
+    }
+    //#endregion
+
+    //#region division
+    public void test_dividedBy()
+    {
+        Rational r = new Rational(3);
+        Rational r1 = new Rational(3, 5);
+        r = r.dividedBy(r1);
+
+        assertThat("", r.numerator(), is(5));
+        assertThat("denominator is 1", r.denominator(), is(1));
+
     }
 
-    public void test_Times_Overflow() 
+    public void test_dividedBy_0()
     {
-        // Given two rationals that will overflow when added
-        Rational large1 = new Rational(Integer.MAX_VALUE, 1);
-        Rational small1 = new Rational(2, 1);
+        Rational r = new Rational();
+        Rational r1 = new Rational(3, 5);
+
+        assertThrows(IllegalArgumentException.class, () -> r1.dividedBy(r));
         
-        // Expect an ArithmeticException when adding large values
-        assertThrows(ArithmeticException.class, () -> large1.times(small1));
     }
 
-    public void test_DivideBy()
+    public void test_dividedBy_Sad()
     {
-        // Given that I have created Rationals representing 2/3 and 5/7
-        Rational p = new Rational(2, 3);
-        Rational q = new Rational(5, 7);
-        // When I compute the value of 2/3 divided by 5/7
-        Rational result = p.dividedBy(q);
-        // Then the result should be 14/15
-        assertThat("2 * 7 = 14", result.numerator(), is(14));
-        assertThat("3 * 5 = 15", result.denominator(), is(15));
-    }
-
-    public void test_Raised_To_The_Power_Of()
-    {
-        // Given that I have created a Rational representing 2/3
-        Rational x = new Rational(2, 3);
-        // When I raise x to the power of 2
-        Rational result = x.raisedToThePowerOf(2);
-        // Then the result should be 4/9 because (2/3)^2 = 4/9
-        assertThat("2^2 = 4", result.numerator(), is(4));
-        assertThat("3^2 = 9", result.denominator(), is(9));
-    }
-
-    public void test1_Raised_To_The_Power_Of_Overflow()
-    {
-        // Given that I have created a Rational representing 2/3
-        Rational x = new Rational(Integer.MAX_VALUE, 1);
-        // When I raise x to the power of 2
-        assertThrows(ArithmeticException.class, () -> x.raisedToThePowerOf(2));
-    }
-
-    public void test2_Raised_To_The_Power_Of_Overflow()
-    {
-        // Given that I have created a Rational representing 2/3
-        Rational x = new Rational(1, Integer.MAX_VALUE);
-        // When I raise x to the power of 2
-        assertThrows(ArithmeticException.class, () -> x.raisedToThePowerOf(2));
-    }
-    //#endregion
-
-    //#region test 0, 1, -1
-    public void test_Happy_is_0()
-    {
-        Rational z = new Rational();
-        boolean isZero = z.isZero();
-        assertThat("0 = 0", isZero, is(true));
-    }
-
-    public void test_Sad_is_0()
-    {
-        Rational z = new Rational(3);
-        boolean isZero = z.isZero();
-        assertThat("3 =/= 0", isZero, is(false));
-    }
-
-    public void test_Happy_is_1()
-    {
-        Rational z = new Rational(1);
-        boolean isOne = z.isOne();
-        assertThat("1 = 1", isOne, is(true));
-    }
-
-    public void test_Sad_is_1()
-    {
-        Rational z = new Rational();
-        boolean isOne = z.isOne();
-        assertThat("0 =/= 1", isOne, is(false));
-    }
-
-    public void test_Happy_is_Neg1()
-    {
-        Rational z = new Rational(-1);
-        boolean isNegOne = z.isMinusOne();
-        assertThat("0 = 0", isNegOne, is(true));
-    }
-
-    public void test_Sad_is_Neg1()
-    {
-        Rational z = new Rational();
-        boolean isNegOne = z.isMinusOne();
-        assertThat("0 =/= -1", isNegOne, is(false));
-    }
-    //#endregion
-
-    //#region test toString
-    public void test_toString()
-    {
-        Rational r = new Rational(3, 7);
-        String tS = r.toString();
-
-        assertThat("3 / 7 = "+tS, tS, is("3 / 7"));
-    }
-
-    public void test_whole_toString()
-    {
-        Rational r = new Rational(4);
-        String tS = r.toString();
-
-        assertThat("4 = "+tS, tS, is("4"));
-    }
-    //#endregion
-
-    //#region test overrides
-    public void test_DoubleValue() 
-    {
-        Rational r = new Rational(1, 2);
-        double result = r.doubleValue();
-        assertThat("1/2 as double should be 0.5", result, is(0.5));
-    }
-
-    public void test_FloatValue() 
-    {
-        Rational r = new Rational(1, 2);
-        float result = r.floatValue();
-        assertThat("1/2 as float should be 0.5", result, is(0.5f));
-    }
-
-    public void test_IntValue() 
-    {
-        Rational r = new Rational(3, 2);
-        int result = r.intValue();
-        assertThat("3/2 as int should truncate to 1", result, is(1));
-    }
-
-    public void test_LongValue() 
-    {
-        Rational r = new Rational(5, 2);
-        long result = r.longValue();
-        assertThat("5/2 as long should truncate to 2", result, is(2L));
-    }
-
-    public void test_CompareTo() 
-    {
+        Rational r = new Rational(Integer.MAX_VALUE);
         Rational r1 = new Rational(1, 2);
-        Rational r2 = new Rational(2, 3);
-        int result = r1.compareTo(r2.doubleValue());
-        assertThat("1/2 should be less than 2/3", result, is(-1));
-    
-        result = r2.compareTo(r1.doubleValue());
-        assertThat("2/3 should be greater than 1/2", result, is(1));
-    
-        Rational r3 = new Rational(2, 4);
-        result = r1.compareTo(r3.doubleValue());
-        assertThat("1/2 should be equal to 2/4", result, is(0));
+
+        assertThrows(IllegalArgumentException.class, () -> r.dividedBy(r1));
+        
     }
     //#endregion
+
+    //#region raised to
+    public void test_raisedToThePowerOf()
+    {
+        Rational r = new Rational(3, 5);
+
+        r = r.raisedToThePowerOf(5);
+
+        assertThat("3^5 = 243", r.numerator(), is(243));
+        assertThat("5^5 = 3125", r.denominator(), is(3125));
+
+    }
+
+    public void test_raisedToThePowerOf_Negative()
+    {
+        Rational r = new Rational(3, 5);
+
+        r = r.raisedToThePowerOf(-5);
+
+        assertThat("3^-5 = 3125", r.numerator(), is(3125));
+        assertThat("5^-5 = 243", r.denominator(), is(243));
+
+    }
+
+    public void test_raisedToThePowerOf_0_to_n()
+    {
+        Rational r = new Rational();
+
+        assertThat("0 raised to anything > 0 is 0", r.raisedToThePowerOf(4), is(0));
+    }
+    
+    public void test_raisedToThePowerOf_0_to_Negative()
+    {
+        Rational r = new Rational();
+
+        assertThrows(IllegalArgumentException.class, () -> r.raisedToThePowerOf(-5));
+    }
+  
+    public void test_raisedToThePowerOf_Overflow_Numerator()
+    {
+        Rational r = new Rational(Integer.MAX_VALUE);
+        assertThrows(IllegalArgumentException.class, () -> r.raisedToThePowerOf(2));
+    }
+
+    public void test_raisedToThePowerOf_Overflow_Denominator()
+    {
+        Rational r = new Rational(1, Integer.MAX_VALUE);
+        assertThrows(IllegalArgumentException.class, () -> r.raisedToThePowerOf(2));
+    }
+
+    //#endregion
+//#endregion
+
+
+//#region comparisons
+    //#region equals
+    public void test_equals_self()
+    {
+        Rational r = new Rational();
+        boolean equals = r.equals(r);
+
+        assertThat("r = r", equals, is(true));
+    }
+
+    public void test_equals_diffDenominator()
+    {
+        Rational r = new Rational(3, 5);
+        Rational r2 = new Rational(3, 7);
+        
+        boolean equals = r.equals(r2);
+
+        assertThat("denominators are not the same", equals, is(false));
+    }
+    
+    public void test_equals_diffNumerator()
+    {
+        Rational r = new Rational(2, 5);
+        Rational r2 = new Rational(3, 5);
+        
+        boolean equals = r.equals(r2);
+
+        assertThat("numerators are not the same", equals, is(false));
+    }
+    
+    public void test_equals_Number()
+    {
+        Number n = 0.5;
+        Rational r = new Rational(1, 2);
+
+        boolean equals = r.equals(n);
+
+        assertThat("1/2 = 0.5", equals, is(true));
+    }
+
+    public void test_equals_Number_Sad()
+    {
+        Number n = 0.6;
+        Rational r = new Rational(1, 2);
+
+        boolean equals = r.equals(n);
+
+        assertThat("1/2 = 0.6", equals, is(false));
+    }
+
+    public void test_equals_notNumber()
+    {
+        String a = "str";
+        Rational r = new Rational();
+
+        assertThat("char is not Rational or Number", r.equals(a), is(false));
+    }
+    
+    public void test_Equals_Float_CloseEnough() 
+    {
+        Rational r = new Rational(1, 2);
+        Float closeEnough = 0.5f + (float)Math.pow(2, -21);
+
+        boolean result = r.equals(closeEnough);
+
+        assertThat("Rational(1/2) should be considered 'equal' to Float closeEnough", result, is(true));
+    }
+
+    public void test_Equals_Float_NotCloseEnough() 
+    {
+        Rational r = new Rational(1, 2); // This is 0.5 when converted to double
+        Float notCloseEnough = 0.5f + (float)Math.pow(2, -19); // Slightly more than 0.5 but outside 2^-20 difference
+
+        boolean result = r.equals(notCloseEnough);
+
+        assertThat("Rational(1/2) should not be considered 'equal' to Float notCloseEnough", result, is(false));
+    }
+
+    public void test_RationalEquals_Integer_WithDenominatorOne() 
+    {
+        Rational r = new Rational(5, 1); // Represents the integer 5
+        Integer i = 5;
+        assertThat(r.equals(i), is(true));
+    }
+
+    public void test_RationalNotEquals_Integer_WithDifferentValue() 
+    {
+        Rational r = new Rational(5);
+        Integer i = 4;
+        assertThat(r.equals(i), is(false));
+    }
+
+    public void test_RationalEquals_Long_WithDenominatorOne() //sad
+    {
+        Rational r = new Rational(3, 2);
+        Long l = 5L;
+        assertThat(r.equals(l), is(false));
+    }
+
+    public void test_RationalEquals_Byte_WithDenominatorOne() 
+    {
+        Rational r = new Rational(7, 2);
+        Byte b = 5;
+        assertThat(r.equals(b), is(false));
+    }
+
+    public void test_RationalEquals_Short_WithDenominatorOne() 
+    {
+        Rational r = new Rational(5);
+        Short s = 5;
+        assertThat(r.equals(s), is(true));
+    }
+    //#endregion
+
+    //#region greaterThan
+    public void test_greaterThan_Rational()
+    {
+        Rational r = new Rational(3, 5);
+        Rational r2 = new Rational(2, 5);
+
+        boolean greater = r.greaterThan(r2);
+
+        assertThat("r > r2", greater, is(true));
+    }
+
+    public void test_greaterThan_Rational_Sad()
+    {
+        Rational r = new Rational(3, 5);
+        Rational r2 = new Rational(4, 5);
+
+        boolean greater = r.greaterThan(r2);
+
+        assertThat("r < r2", greater, is(false));
+    }
+    
+    public void test_greaterThan_Number()
+    {
+        Number n = 0.3;
+        Rational r = new Rational(1, 2);
+
+        assertThat("1/2 > 0.3", r.greaterThan(n), is(true));
+    }
+
+    public void test_greaterThan_Number_Sad()
+    {
+        Number n = 0.6;
+        Rational r = new Rational(1, 2);
+
+        assertThat("1/2 < 0.6", r.greaterThan(n), is(false));
+    }
+    
+    //#endregion
+
+    //#region lessThan
+    public void test_lessThan_Rational()
+    {
+        Rational r = new Rational(3, 5);
+        Rational r2 = new Rational(4, 5);
+
+        boolean less = r.lessThan(r2);
+
+        assertThat("r < r2", less, is(true));
+    }
+
+    public void test_lessThan_Rational_Sad()
+    {
+        Rational r = new Rational(3, 5);
+        Rational r2 = new Rational(2, 5);
+
+        boolean less = r.lessThan(r2);
+
+        assertThat("r > r2", less, is(false));
+    }
+    
+    public void test_lessThan_Number()
+    {
+        Number n = 0.6;
+        Rational r = new Rational(1, 2);
+
+        assertThat("1/2 < 0.6", r.lessThan(n), is(true));
+    }
+
+    public void test_lessThan_Number_Sad()
+    {
+        Number n = 0.3;
+        Rational r = new Rational(1, 2);
+
+        assertThat("1/2 > 0.3", r.lessThan(n), is(false));
+    }
+    //#endregion
+//#endregion
+
+
+//#region overrides
+
+    //#region test compareTo
+    public void test_compareTo_Equal()
+    {
+        Number n = 0.6;
+        int numerator = 3;
+        int denominator = 5;
+        Rational r = new Rational(numerator, denominator);
+
+        int comp = r.compareTo(n);
+        assertThat("3/5 = " + n, comp, is(0));
+    }
+
+    public void test_compareTo_Greater()
+    {
+        Number n = 0.6;
+        int numerator = 4;
+        int denominator = 5;
+        Rational r = new Rational(numerator, denominator);
+
+        int comp = r.compareTo(n);
+        assertThat("4/5 > " + n, comp, is(1));
+    }
+
+    public void test_compareTo_Less()
+    {
+        Number n = 0.6;
+        int numerator = 2;
+        int denominator = 5;
+        Rational r = new Rational(numerator, denominator);
+
+        int comp = r.compareTo(n);
+        assertThat("2/5 < " + n, comp, is(-1));
+    }
+    //#endregion
+
+    public void test_doubleValue()
+    {
+        int numerator = 3;
+        int denominator = 5;
+        Rational r = new Rational(numerator, denominator);
+        double dr = r.doubleValue();
+
+        assertEquals(((double)numerator/denominator), dr);
+    }
+
+    public void test_floatValue()
+    {
+        int numerator = 3;
+        int denominator = 5;
+        Rational r = new Rational(numerator, denominator);
+        float fr = r.floatValue();
+
+        assertEquals(((float)numerator/denominator), fr);
+    }
+    
+    public void test_intValue()
+    {
+        int numerator = 3;
+        int denominator = 5;
+        Rational r = new Rational(numerator, denominator);
+        int ir = r.intValue();
+
+        assertEquals((numerator/denominator), ir);
+    }
+    
+    public void test_longValue()
+    {
+        int numerator = 3;
+        int denominator = 5;
+        Rational r = new Rational(numerator, denominator);
+        long lr = r.longValue();
+
+        assertEquals(((long)numerator/denominator), lr);
+    }
+//#endregion
 }
