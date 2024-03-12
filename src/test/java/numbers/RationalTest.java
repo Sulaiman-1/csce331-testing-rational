@@ -130,6 +130,15 @@ public class RationalTest extends TestCase
         assertThat("3/-5  is -3/5", r.equals(new Rational(-3, 5)), is(true));
     }
     
+    public void test_RationalConstructor_NegateOverflow_A() 
+    {
+        assertThrows(IllegalArgumentException.class, () -> new Rational(Integer.MIN_VALUE, -1));
+    }
+    
+    public void test_RationalConstructor_NegateOverflow_B() 
+    {
+        assertThrows(IllegalArgumentException.class, () -> new Rational(-1, Integer.MIN_VALUE));
+    }
 //#endregion
 
 

@@ -16,9 +16,7 @@ public class Rational extends Number implements Comparable<Number>
         {
             return (Rational) n;
         } 
-        // else if (n instanceof Integer || n instanceof Long || n instanceof Byte || n instanceof Short) {
-        //     return new Rational(n.intValue(), 1);
-        // } 
+ 
         else 
         { // For Float, Double, and other number types
             // Convert to a double, but be aware this might not be perfectly accurate for very large or very precise numbers
@@ -55,25 +53,29 @@ public class Rational extends Number implements Comparable<Number>
 
     Rational (Rational r) { this(r.numerator(), r.denominator()); }
 
-    Rational(int a, int b)
+    Rational(int a, int b) //could overflow
     {
         if(b == 0)
         {
             throw new IllegalArgumentException("Denominator cannot be 0");
         }
-        else
+        try 
         {
-            if(b < 0)
+            if(b < 0) 
             {
-                a *= -1;
-                b *= -1;
+                a = Math.negateExact(a);
+                b = Math.negateExact(b);
             }
-
-            int gcd = gcd(a, b);
-            
-            theNumerator = a / gcd;
-            theDenominator = b / gcd;
+        } 
+        catch (ArithmeticException e) 
+        {
+            throw new IllegalArgumentException("Overflow when negating");
         }
+    
+        int gcd = gcd(a, b);
+        
+        theNumerator = a / gcd;
+        theDenominator = b / gcd;
     }
 //#endregion
 
@@ -84,6 +86,7 @@ public class Rational extends Number implements Comparable<Number>
         {
             int newNumerator = Math.addExact(Math.multiplyExact(theNumerator, r.theDenominator), Math.multiplyExact(r.theNumerator, theDenominator));
             int newDenominator = Math.multiplyExact(theDenominator, r.theDenominator);
+            //
             return new Rational(newNumerator, newDenominator);
         }
         catch (ArithmeticException e) 
