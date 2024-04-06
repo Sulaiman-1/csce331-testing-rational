@@ -35,12 +35,6 @@ public class RationalTest extends TestCase
      * Rigourous Test :-)
     */
 
-    public void test_NumberToRational_Rational() 
-    {
-        Rational input = new Rational(3, 4);
-        Rational result = input.numberToRational(input);
-        assertThat(result, is(input));
-    }
 
     public void test_opposite()
     {
@@ -48,7 +42,12 @@ public class RationalTest extends TestCase
 
         assertThat("the opposite of 3/5 is -3/5", r.opposite(), is(new Rational(-3, 5)));
     }
+    public void test_opposite_Sad()
+    {
+        Rational r = new Rational(Integer.MIN_VALUE);
 
+        assertThrows(IllegalArgumentException.class, () -> r.opposite());
+    }
     public void test_reciprocal()
     {
         Rational r = new Rational(3, 5);
@@ -154,6 +153,14 @@ public class RationalTest extends TestCase
         assertThat("denominator is 5", r2.denominator(), is(5));
     }
 
+    public void test_plus_diffDenom()
+    {
+        Rational r = new Rational(1,2);
+        Rational r2 = new Rational(3, 5);
+
+        assertEquals(r.plus(r2), new Rational(11, 10));
+    }
+
     public void test_plus_Sad()
     {
         Rational r1 = new Rational(Integer.MAX_VALUE);
@@ -179,6 +186,14 @@ public class RationalTest extends TestCase
         Rational r2 = new Rational(1);
 
         assertThrows(IllegalArgumentException.class, () -> r1.minus(r2));
+    }
+    
+    public void test_minus_diffDenom()
+    {
+        Rational r = new Rational(1,2);
+        Rational r2 = new Rational(3, 5);
+
+        assertEquals(r.minus(r2), new Rational(-1, 10));
     }
     //#endregion
     
@@ -210,7 +225,6 @@ public class RationalTest extends TestCase
 
         assertThat("", r.numerator(), is(5));
         assertThat("denominator is 1", r.denominator(), is(1));
-
     }
 
     public void test_dividedBy_0()
@@ -218,8 +232,7 @@ public class RationalTest extends TestCase
         Rational r = new Rational();
         Rational r1 = new Rational(3, 5);
 
-        assertThrows(IllegalArgumentException.class, () -> r1.dividedBy(r));
-        
+        assertThrows(IllegalArgumentException.class, () -> r1.dividedBy(r));  
     }
 
     public void test_dividedBy_Sad()
@@ -280,7 +293,20 @@ public class RationalTest extends TestCase
         Rational r = new Rational(1, Integer.MAX_VALUE);
         assertThrows(IllegalArgumentException.class, () -> r.raisedToThePowerOf(2));
     }
+    
+    public void test_raisedToThePowerOf_Underflow() 
+    {
+        Rational r = new Rational(1);
+        assertThrows(IllegalArgumentException.class, () -> r.raisedToThePowerOf(Integer.MIN_VALUE));
+    }
 
+    public void test_raisedToThePowerOf_MAX() 
+    {
+        Rational r = new Rational(1);
+        Rational r2 = r.raisedToThePowerOf(Integer.MAX_VALUE);
+        assertEquals(r2.numerator(), 1);
+        assertEquals(r2.denominator(), 1);
+    }
     //#endregion
 //#endregion
 
@@ -555,4 +581,16 @@ public class RationalTest extends TestCase
         assertEquals(((long)numerator/denominator), lr);
     }
 //#endregion
+
+    public void test_toString()
+    {
+        Rational r = new Rational(1,2);
+        
+        assertEquals(r.toString(), "1/2");
+
+        r = r.plus(r);
+
+        assertEquals(r.toString(), "1");
+    }
+
 }

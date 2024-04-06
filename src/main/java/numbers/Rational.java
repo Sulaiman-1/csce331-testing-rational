@@ -1,4 +1,5 @@
 package numbers;
+
 public class Rational extends Number implements Comparable<Number>
 {
     private int theNumerator;
@@ -7,32 +8,21 @@ public class Rational extends Number implements Comparable<Number>
 //#region utilities
     private int gcd(int a, int b) 
     {
-        return b == 0 ? a : gcd(b, a % b);
+        return b == 0 ? Math.abs(a) : gcd(b, a % b);
     }
 
-    public Rational numberToRational(Number n) 
-    {
-        if (n instanceof Rational) 
-        {
-            return (Rational) n;
-        } 
- 
-        else 
-        { // For Float, Double, and other number types
-            // Convert to a double, but be aware this might not be perfectly accurate for very large or very precise numbers
-            double value = n.doubleValue();
-            return doubleToRational(value);
-        }
-    }
+    // public Rational numberToRational(Number n) 
+    // {
+    //     double value = n.doubleValue();
+    //     return doubleToRational(value);
+    // }
     
-    private Rational doubleToRational(double value) 
-    {
-        // This is a simplistic conversion that may not handle very precise or very large values well.
-        // Consider using a more sophisticated method for converting double to rational in real applications.
-        int denominator = 1000000; // Arbitrary choice to convert to fraction
-        int numerator = (int)(value * denominator);
-        return new Rational(numerator, denominator);
-    }
+    // private Rational doubleToRational(double value) 
+    // {
+    //     int denominator = 1000000; // Arbitrary choice to convert to fraction
+    //     int numerator = (int)(value * denominator);
+    //     return new Rational(numerator, denominator);
+    // }
 
 //#endregion
 
@@ -41,7 +31,14 @@ public class Rational extends Number implements Comparable<Number>
 
     public int denominator() { return theDenominator; }
 
-    public Rational opposite() { return new Rational(-1 * theNumerator, theDenominator); }
+    public Rational opposite() 
+    {
+        if(theNumerator == Integer.MIN_VALUE)
+        {
+            throw new IllegalArgumentException();
+        }
+        return new Rational(-1 * theNumerator, theDenominator);
+    }
 
     public Rational reciprocal() { return new Rational(theDenominator, theNumerator); }
 //#endregion
@@ -53,7 +50,7 @@ public class Rational extends Number implements Comparable<Number>
 
     Rational (Rational r) { this(r.numerator(), r.denominator()); }
 
-    Rational(int a, int b) //could overflow
+    Rational(int a, int b)
     {
         if(b == 0)
         {
@@ -61,7 +58,17 @@ public class Rational extends Number implements Comparable<Number>
         }
         try 
         {
-            if(b < 0) 
+            if(a == 0)
+            {
+                b = 1;
+            }
+            else if(a == b)
+            {
+                theNumerator = 1;
+                theDenominator = 1;
+            }
+
+            else if(b < 0) 
             {
                 a = Math.negateExact(a);
                 b = Math.negateExact(b);
@@ -84,14 +91,19 @@ public class Rational extends Number implements Comparable<Number>
     {
         try 
         {
+            if(theDenominator == r.theDenominator)
+            {
+                int newNumerator = Math.addExact(theNumerator, r.theNumerator);
+                return new Rational(newNumerator, theDenominator);
+            }
+
             int newNumerator = Math.addExact(Math.multiplyExact(theNumerator, r.theDenominator), Math.multiplyExact(r.theNumerator, theDenominator));
             int newDenominator = Math.multiplyExact(theDenominator, r.theDenominator);
-            //
             return new Rational(newNumerator, newDenominator);
         }
-        catch (ArithmeticException e) 
+        catch (Exception e) 
         {
-            throw new IllegalArgumentException("Overflow occurred during addition");
+            throw new IllegalArgumentException(e);
         }
     }
 
@@ -99,13 +111,20 @@ public class Rational extends Number implements Comparable<Number>
     {
         try 
         {
+            if(theDenominator == r.theDenominator)
+            {
+                int newNumerator = Math.subtractExact(theNumerator, r.theNumerator);
+                return new Rational(newNumerator, theDenominator);
+            }
+
             int newNumerator = Math.subtractExact(Math.multiplyExact(theNumerator, r.theDenominator), Math.multiplyExact(r.theNumerator, theDenominator));
             int newDenominator = Math.multiplyExact(theDenominator, r.theDenominator);
+            
             return new Rational(newNumerator, newDenominator);
         } 
         catch (ArithmeticException e) 
         {
-            throw new IllegalArgumentException("Overflow occurred during subtraction");
+            throw new IllegalArgumentException(e);
         }
     }
 
@@ -113,35 +132,28 @@ public class Rational extends Number implements Comparable<Number>
     {
         try 
         {
-            int newNumerator = Math.multiplyExact(theNumerator, r.theNumerator);
-            int newDenominator = Math.multiplyExact(theDenominator, r.theDenominator);
+            Rational r2 = new Rational(theNumerator, r.theDenominator);
+            Rational r3 = new Rational(r.theNumerator, theDenominator);
+            
+            int newNumerator = Math.multiplyExact(r2.numerator(), r3.numerator());
+            int newDenominator = Math.multiplyExact(r2.denominator(), r3.denominator());
+
             return new Rational(newNumerator, newDenominator);
-        } 
+        }
         catch (ArithmeticException e) 
         {
-            throw new IllegalArgumentException("Overflow occurred during multiplication");
+            throw new IllegalArgumentException(e);
         }
     }
 
     public Rational dividedBy(Rational r)
     {
-        if (r.theNumerator == 0) { throw new IllegalArgumentException("Division by zero"); }
-        
-        try 
-        {
-            int newNumerator = Math.multiplyExact(theNumerator, r.theDenominator);
-            int newDenominator = Math.multiplyExact(theDenominator, r.theNumerator);
-            return new Rational(newNumerator, newDenominator);
-        } 
-        catch (ArithmeticException e) 
-        {
-            throw new IllegalArgumentException("Overflow occurred during division");
-        }
+        return this.times(r.reciprocal());
     }
 
     public Rational raisedToThePowerOf(int n)
     {
-        if (theNumerator == 0) 
+        if (theNumerator == 0 || n == Integer.MAX_VALUE || n == Integer.MIN_VALUE) 
         {
             if( n < 0)
             {
@@ -162,6 +174,8 @@ public class Rational extends Number implements Comparable<Number>
             
 
             int power = Math.abs(n);
+            
+            //TODO: may not need long
 
             long tempNumerator = 1;
             long tempDenominator = 1;
@@ -177,82 +191,68 @@ public class Rational extends Number implements Comparable<Number>
             {
                 throw new ArithmeticException("Result causes positive overflow");
             }
-
+      
             return new Rational((int)tempNumerator, (int)tempDenominator);
         } 
         catch (ArithmeticException e) 
         {
-            throw new IllegalArgumentException("Overflow occurred during exponentiation");
+            throw new IllegalArgumentException(e);
         }
     }
-    //#endregion
+//#endregion
 
 //#region comparisons
-    public boolean equals(Object o)
+public boolean equals(Object o) 
+{
+    if (this == o) return true;
+
+    if (!(o instanceof Number)) return false;
+
+    if (o instanceof Rational) 
     {
-        if (this == o) return true;
-
-        if (!(o instanceof Number)) return false;
-
-        if (o instanceof Rational) 
-        {
-            Rational r = (Rational) o;
-            return this.theNumerator == r.theNumerator && this.theDenominator == r.theDenominator;
-        }
-
-        Number n = (Number) o;
-        if (n instanceof Integer || n instanceof Long || n instanceof Byte || n instanceof Short) 
-        {
-            if (this.denominator() == 1) 
-            {
-                long otherValue = n.longValue();
-                return this.numerator() == otherValue;
-            }
-            return false;
-        }
-
-        double otherValue = n.doubleValue();
-        double diff = Math.abs(this.doubleValue() - otherValue);
-        if (n instanceof Float) 
-        {
-            return diff < Math.pow(2, -20);
-        } 
-        else 
-        {
-            return diff < Math.pow(2, -40);
-        }
+        Rational r = (Rational) o;
+        return this.theNumerator == r.theNumerator && this.theDenominator == r.theDenominator;
     }
 
-    public boolean greaterThan(Number n)
+    if (o instanceof Integer || o instanceof Long || o instanceof Byte || o instanceof Short) 
     {
-        Rational r = numberToRational(n);
-        long lhs = (long) theNumerator * r.theDenominator;
-        long rhs = (long) r.theNumerator * theDenominator;
-        return lhs > rhs;
+        return this.denominator() == 1 && this.numerator() == ((Number) o).longValue();
+    }
+
+    double otherValue = ((Number) o).doubleValue();
+    double diff = Math.abs(this.doubleValue() - otherValue);
+    double tolerance = (o instanceof Float) ? Math.pow(2, -20) : Math.pow(2, -40);
+
+    return diff < tolerance;
+}
+
+
+    public boolean greaterThan(Number n) 
+    {
+        return this.compareTo(n) == 1;
+
     }
 
     public boolean greaterThan(Rational r)
     {
         long lhs = (long) this.theNumerator * r.theDenominator;
         long rhs = (long) r.theNumerator * this.theDenominator;
-        
+    
         // If this object's value is greater than r's value, return true
         return lhs > rhs;
     }
 
-    public boolean lessThan(Number n)
+    public boolean lessThan(Number n) 
     {
-        Rational r = numberToRational(n);
-        long lhs = (long) theNumerator * r.theDenominator;
-        long rhs = (long) r.theNumerator * theDenominator;
-        return lhs < rhs;
+        return this.compareTo(n) == -1;
     }
 
     public boolean lessThan(Rational r)
     {
+
         long lhs = (long) this.theNumerator * r.theDenominator;
         long rhs = (long) r.theNumerator * this.theDenominator;
-        
+
         // If this object's value is less than r's value, return true
         return lhs < rhs;
     }
@@ -286,13 +286,23 @@ public class Rational extends Number implements Comparable<Number>
         }
         return false;
     }
-//#endregion
+
+    public String toString()
+    {
+        return(theDenominator == 1) ? theNumerator+"" : theNumerator +"/"+theDenominator;
+    }
+    //#endregion
 
 //#region override methods
     @Override
     public int compareTo(Number arg0) 
     {
-        double thisValue = this.doubleValue();
+        if(equals(arg0))
+        {
+            return 0;
+        }
+
+        double thisValue = doubleValue();
         double thatValue = arg0.doubleValue();
 
         return Double.compare(thisValue, thatValue);
@@ -323,4 +333,6 @@ public class Rational extends Number implements Comparable<Number>
     }
 
     //#endregion
+
+
 }
